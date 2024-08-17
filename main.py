@@ -1,10 +1,8 @@
 # TODO
 # handle ip and name from device and send most recent ips and names it needs to function
 # store data into csv
-# if connected device has the same name but different ip, then update the ip
 # log all unique connections from devices
 # create new thread for each device that connects
-# move dataframe initialization out of return_data function
 
 import socket
 import datetime
@@ -20,7 +18,6 @@ def handle_client(client_socket, address):
     while True:
         try:
             data = client_socket.recv(1024)
-
             if not data:
                 break
 
@@ -37,24 +34,23 @@ def handle_client(client_socket, address):
 
     client_socket.close()
 
+
 # defines pandas dataframe returns the device ip address the client is searching for
-def return_data(device_name):
-    value_names = ["device-name", "ip-address", "timestamp"]
-
-    if(os.path.isfile("devices.csv")):
-        dataframe = pandas.read_csv("devices.csv", names=value_names)
-        dataframe["timestamp"] = pandas.to_datetime(dataframe["timestamp"])
-    else:
-        print("File not found or column names wrong")
-
+def return_data(dataframe, device_name):
     try:
         device_ip_address = dataframe.loc[dataframe["device-name"] == device_name, "ip-address"].value[0]
-    
     except IndexError as i:
         print(i)
-
     return device_ip_address
-    
+
+
+#checks for if the ip address stored in the dataframe equals the current one
+#if it doesn't then update it to the current one
+def replace_device_ip(device_ip_address, device_name, dataframe):
+    if(device_ip_address == dataframe.loc[dataframe["device-name"] == device_name, "ip-address"]):
+        pass
+    else:
+        dataframe.loc[dataframe["device-name"] == device_name, "ip-address"] = device_ip_address
 
 
 
@@ -83,3 +79,15 @@ def start_server():
         server.close()
 
 
+
+
+if __name__ == "__main__":
+    value_names = ["device-name", "ip-address", "timestamp"]
+
+    if(os.path.isfile("devices.csv")):
+        dataframe = pandas.read_csv("devices.csv", names=value_names)
+        dataframe["timestamp"] = pandas.to_datetime(dataframe["timestamp"])
+    else:
+        print("File not found or column names wrong")
+
+    
