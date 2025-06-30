@@ -1,2 +1,3 @@
 # Stratus-IOT-Server
-Server storing information about my IOT devices
+Server storing information for IOT devices
+Version 1.0
